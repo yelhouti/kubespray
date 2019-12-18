@@ -46,9 +46,13 @@ spec:
         - containerPort: 53
           name: dns
           protocol: UDP
+          hostPort: 53
+          hostIP: {{ nodelocaldns_ip }}
         - containerPort: 53
           name: dns-tcp
           protocol: TCP
+          hostPort: 53
+          hostIP: {{ nodelocaldns_ip }}
         - containerPort: 9253
           name: metrics
           protocol: TCP

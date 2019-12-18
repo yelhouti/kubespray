@@ -48,6 +48,7 @@
     - "{{ coredns_manifests.results | default({}) }}"
     - "{{ coredns_secondary_manifests.results | default({}) }}"
     - "{{ nodelocaldns_manifests.results | default({}) }}"
+    - "{{ externaldns_manifests.results | default({}) }}"
   when:
     - dns_mode != 'none'
     - inventory_hostname == groups['kube-master'][0]
@@ -73,3 +74,12 @@
   when: dashboard_enabled
   tags:
     - dashboard
+
+- name: create etcd secret
+  shell: |
+    kubectl --namespace=kube-system create secret generic etcd-client-certs --from-file=ca.crt=/etc/ssl/etcd/ssl/ca.pem --from-file=cert.pem=/etc/ssl/etcd/ssl/admin-{{ inventory_hostname }}.pem --from-file=key.pem=/etc/ssl/etcd/ssl/admin-{{ inventory_hostname }}-key.pem
+  become: true
+  run_once: true
+  when: inventory_hostname == groups['etcd'][0]
+  tags:
+    - etcd

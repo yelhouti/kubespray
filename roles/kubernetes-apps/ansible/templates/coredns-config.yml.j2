@@ -24,6 +24,13 @@ data:
 {% endif %}
           fallthrough in-addr.arpa ip6.arpa
         }
+{% if enable_external_dns %}
+        etcd . {
+          endpoint {{ groups['etcd'] | map('extract', hostvars, ['ansible_host']) | map('regex_replace', '(.*)', 'https://\\1:2379') | join(' ') }}
+          tls /tls/etcd/cert.pem /tls/etcd/key.pem /tls/etcd/ca.crt
+          fallthrough .
+        }
+{% endif %}
         prometheus :9153
 {% if resolvconf_mode == 'host_resolvconf' and upstream_dns_servers is defined and upstream_dns_servers|length > 0 %}
         forward . {{ upstream_dns_servers|join(' ') }} {

@@ -41,3 +41,21 @@
     - inventory_hostname == groups['kube-master'][0]
   tags:
     - coredns
+
+- name: Kubernetes Apps | External DNS
+  action: "{{ item.module }}"
+  args:
+    src: "{{ item.file }}{% if item.module == 'template' %}.j2{% endif %}"
+    dest: "{{ kube_config_dir }}/{{ item.file }}"
+  with_items:
+    - { name: external-dns, module: copy, file: external-dns-sa.yml, type: sa }
+    - { name: external-dns, module: template, file: external-dns-deployment.yml, type: deployment }
+    - { name: external-dns, module: copy, file: external-dns-clusterrole.yml, type: clusterrole }
+    - { name: external-dns, module: copy, file: external-dns-clusterrolebinding.yml, type: clusterrolebinding }
+  register: externaldns_manifests
+  when:
+    - enable_external_dns
+    - dns_mode in ['coredns', 'coredns_dual']
+    - inventory_hostname == groups['kube-master'][0]
+  tags:
+    - coredns

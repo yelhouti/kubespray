@@ -70,6 +70,9 @@ enable_nodelocaldns: true
 nodelocaldns_ip: 169.254.25.10
 nodelocaldns_health_port: 9254
 
+# use external-dns to automatically configure DNS for ingress and services https://github.com/kubernetes-incubator/external-dns
+enable_external_dns: true
+
 # Should be set to a cluster IP if using a custom cluster DNS
 manual_dns_server: ""
 

@@ -71,6 +71,11 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
           ports:
             - name: http
               containerPort: 80
@@ -78,6 +83,18 @@ spec:
             - name: https
               containerPort: 443
               hostPort: {{ ingress_nginx_secure_port }}
+{% if enable_external_dns %}
+            - containerPort: 53
+              hostIP: $(HOST_IP)
+              hostPort: 53
+              name: dns
+              protocol: UDP
+            - containerPort: 53
+              hostIP: $(HOST_IP)
+              hostPort: 53
+              name: dns-tcp
+              protocol: TCP
+{% endif %}
           livenessProbe:
             failureThreshold: 3
             httpGet:

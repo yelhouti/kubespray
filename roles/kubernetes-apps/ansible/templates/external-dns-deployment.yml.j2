@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+  namespace: kube-system
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: external-dns
+  template:
+    metadata:
+      labels:
+        app: external-dns
+    spec:
+      serviceAccountName: external-dns
+      containers:
+      - name: external-dns
+        image: {{ externaldns_image_repo }}:{{ externaldns_image_tag }}
+        args:
+        - --source=ingress
+        - --provider=coredns
+        - --log-level=debug # debug only
+        env:
+        - name: ETCD_URLS
+          value: {{ groups['etcd'] | map('extract', hostvars, ['ansible_host']) | map('regex_replace', '(.*)', 'https://\\1:2379') | join(' ') }}
+        - name: ETCD_CERT_FILE
+          value: /tls/etcd/cert.pem
+        - name: ETCD_KEY_FILE
+          value: /tls/etcd/key.pem
+        - name: ETCD_CA_FILE
+          value: /tls/etcd/ca.crt
+        volumeMounts:
+        - mountPath: /tls/etcd
+          name: etcd-client-certs
+          readOnly: true
+      volumes:
+      - name: etcd-client-certs
+        secret:
+          secretName: etcd-client-certs

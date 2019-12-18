@@ -357,6 +357,10 @@ nodelocaldns_version: "1.15.8"
 nodelocaldns_image_repo: "{{ kube_image_repo }}/k8s-dns-node-cache"
 nodelocaldns_image_tag: "{{ nodelocaldns_version }}"
 
+externaldns_version: "v0.5.16"
+externaldns_image_repo: "registry.opensource.zalan.do/teapot/external-dns"
+externaldns_image_tag: "{{ externaldns_version }}"
+
 dnsautoscaler_version: 1.6.0
 dnsautoscaler_image_repo: "{{ kube_image_repo }}/cluster-proportional-autoscaler-{{ image_arch }}"
 dnsautoscaler_image_tag: "{{ dnsautoscaler_version }}"
